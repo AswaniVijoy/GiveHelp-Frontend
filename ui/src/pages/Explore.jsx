@@ -10,7 +10,7 @@ const Explore = () => {
   const [statusFilter, setStatusFilter] = useState("All");
 
   useEffect(() => {
-    fetch("/api/campaign")
+    fetch(`${import.meta.env.VITE_API_URL}/campaign`)
       .then(res => res.json())
       .then(data => { setCampaigns(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => setLoading(false));
@@ -72,7 +72,7 @@ const Explore = () => {
                 }>
                   <div className="h-40 bg-gray-100 relative">
                     {c.Image ? (
-                      <img src={`/api/campaign/image/${encodeURIComponent(c.Title)}`} alt={c.Title} className="w-full h-full object-cover" />
+                      <img src={`${import.meta.env.VITE_API_URL}/campaign/image/${encodeURIComponent(c.Title)}`} alt={c.Title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="h-full flex items-center justify-center text-gray-400 text-sm">No Image</div>
                     )}

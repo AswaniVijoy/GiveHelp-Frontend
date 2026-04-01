@@ -13,7 +13,7 @@ const Donate = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/campaign/" + id)
+    fetch(`${import.meta.env.VITE_API_URL}/campaign/` + id)
       .then((res) => res.json())
       .then((data) => {
         if (data.Status === "Closed") {
@@ -51,7 +51,7 @@ const Donate = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/user/donate", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/user/donate`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token },
         credentials: "include",

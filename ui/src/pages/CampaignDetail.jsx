@@ -10,7 +10,7 @@ const CampaignDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/campaign/" + id)
+    fetch(`${import.meta.env.VITE_API_URL}/campaign/` + id)
       .then((res) => res.json())
       .then((data) => { setCampaign(data); setLoading(false); })
       .catch(() => setLoading(false));
@@ -35,7 +35,7 @@ const CampaignDetail = () => {
         <div className="lg:col-span-2">
           <div className="rounded-2xl overflow-hidden bg-gray-100 h-64 relative">
             {campaign.Image ? (
-              <img src={`/api/campaign/image/${encodeURIComponent(campaign.Title)}`} alt={campaign.Title} className="w-full h-full object-cover" />
+              <img src={`${import.meta.env.VITE_API_URL}/campaign/image/${encodeURIComponent(campaign.Title)}`} alt={campaign.Title} className="w-full h-full object-cover" />
             ) : (
               <div className="h-full flex items-center justify-center text-gray-400">No Image</div>
             )}
