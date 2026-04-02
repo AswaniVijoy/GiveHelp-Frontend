@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const API = import.meta.env.VITE_API_URL;
+
 const AdminCampaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,12 +11,12 @@ const AdminCampaigns = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`${import.meta.env.VITE_API_URL}/admin/campaigns`, {
+    fetch(`${API}/api/admin/campaigns`, {
       headers: { Authorization: token },
-      credentials: "include",
+      credentials: "include"
     })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         setCampaigns(Array.isArray(data) ? data : []);
         setLoading(false);
       })
@@ -22,38 +24,33 @@ const AdminCampaigns = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (
-      !window.confirm(
-        "Archive this campaign? It will be marked as archived but remain visible here for transparency."
-      )
-    )
-      return;
+    if (!window.confirm("Archive this campaign?")) return;
 
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/admin/campaign/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: token },
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${API}/api/admin/campaign/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: token },
+        credentials: "include"
+      });
 
       const data = await res.json();
 
       if (res.ok) {
         toast.success(data.msg);
 
-        setCampaigns(
-          campaigns.map((c) =>
-            c._id === id ? { ...c, isDeleted: true } : c
+        setCampaigns(prev =>
+          prev.map(c =>
+            c._id === id
+              ? { ...c, isDeleted: true, Status: "Archived" }
+              : c
           )
         );
       } else {
         toast.error(data.msg || "Archive failed");
       }
+
     } catch {
       toast.error("Server error");
     }
@@ -76,9 +73,7 @@ const AdminCampaigns = () => {
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading...</div>
         ) : campaigns.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No campaigns yet.
-          </div>
+          <div className="p-8 text-center text-gray-500">No campaigns yet.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -94,7 +89,7 @@ const AdminCampaigns = () => {
               </thead>
 
               <tbody>
-                {campaigns.map((c) => (
+                {campaigns.map(c => (
                   <tr
                     key={c._id}
                     className={
@@ -130,6 +125,8 @@ const AdminCampaigns = () => {
                           "font-medium " +
                           (c.Status === "Active"
                             ? "text-green-600"
+                            : c.Status === "Archived"
+                            ? "text-gray-500"
                             : "text-orange-500")
                         }
                       >
@@ -160,10 +157,10 @@ const AdminCampaigns = () => {
                         </span>
                       )}
                     </td>
+
                   </tr>
                 ))}
               </tbody>
-
             </table>
           </div>
         )}
