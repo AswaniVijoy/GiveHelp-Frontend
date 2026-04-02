@@ -40,18 +40,12 @@ const Explore = () => {
                 )
               : 0;
 
-          const isClosed =
-            campaign.Status === "Closed" ||
-            campaign.Raised >= campaign.Goal;
-
           return (
             <div
               key={campaign._id}
-              className={`bg-white rounded-xl shadow-sm overflow-hidden border ${
-                isClosed ? "opacity-80" : ""
-              }`}
+              className="bg-white rounded-xl shadow-sm overflow-hidden border"
             >
-              <div className="h-48 bg-gray-200 relative">
+              <div className="h-48 bg-gray-200">
 
                 {campaign.Image ? (
                   <img
@@ -64,14 +58,6 @@ const Explore = () => {
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400">
                     No Image
-                  </div>
-                )}
-
-                {isClosed && (
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <span className="text-white font-semibold bg-black px-4 py-2 rounded-full">
-                      Campaign Closed
-                    </span>
                   </div>
                 )}
 
