@@ -29,7 +29,7 @@ const AdminCampaigns = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch(`${API}/api/admin/campaign/${id}`, {
+      const res = await fetch(`${API}/admin/campaign/${id}`, {
         method: "DELETE",
         headers: { Authorization: token },
         credentials: "include"
