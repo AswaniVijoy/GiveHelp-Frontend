@@ -11,7 +11,7 @@ const AdminCampaigns = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`${API}/api/admin/campaigns`, {
+    fetch(`${API}/admin/campaigns`, {
       headers: { Authorization: token },
       credentials: "include"
     })
