@@ -6,11 +6,14 @@ const CampaignDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
+
   const [campaign, setCampaign] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const API = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/campaign/` + id)
+    fetch(`${API}/campaign/` + id)
       .then((res) => res.json())
       .then((data) => {
         setCampaign(data);
@@ -29,7 +32,7 @@ const CampaignDetail = () => {
   if (!campaign)
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Campaign not found.
+        Campaign not found
       </div>
     );
 
@@ -38,11 +41,8 @@ const CampaignDetail = () => {
       ? Math.min(Math.round((campaign.Raised / campaign.Goal) * 100), 100)
       : 0;
 
-  const isCompleted = campaign.Goal > 0 && campaign.Raised >= campaign.Goal;
-  const isClosed = campaign.Status === "Closed";
-
-  // NEW combined state
-  const isFinished = isCompleted || isClosed;
+  const isClosed =
+    campaign.Status === "Closed" || campaign.Raised >= campaign.Goal;
 
   const handleDonateClick = () => {
     if (!profile) navigate("/login");
@@ -50,166 +50,92 @@ const CampaignDetail = () => {
   };
 
   return (
-    <div className="bg-gray-50 text-gray-800 min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       <main className="max-w-5xl mx-auto px-6 pt-10 pb-16 grid lg:grid-cols-3 gap-8">
 
-        {/* LEFT SIDE */}
         <div className="lg:col-span-2">
 
           <div className="rounded-2xl overflow-hidden bg-gray-100 h-64 relative">
             {campaign.Image ? (
               <img
-                src={`${import.meta.env.VITE_API_URL}/campaign/image/${encodeURIComponent(
+                src={`${API}/campaign/image/${encodeURIComponent(
                   campaign.Title
                 )}`}
                 alt={campaign.Title}
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="h-full flex items-center justify-center text-gray-400">
+              <div className="flex items-center justify-center h-full text-gray-400">
                 No Image
               </div>
             )}
 
-            {/* SAME OVERLAY FOR CLOSED + COMPLETED */}
-            {isFinished && (
+            {isClosed && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <span className="text-white text-lg font-bold tracking-wide bg-black px-5 py-2 rounded-full">
-                  🚫 Campaign Closed
+                <span className="text-white text-lg font-bold bg-black px-5 py-2 rounded-full">
+                  Campaign Closed
                 </span>
               </div>
             )}
           </div>
 
           <h1 className="text-2xl font-bold mt-6">{campaign.Title}</h1>
-          <p className="text-gray-600 mt-3">
-            Your donation makes a direct impact.
-          </p>
 
-          {/* STORY */}
-          <section className="mt-6 bg-white border border-gray-300 shadow-sm rounded-2xl p-5">
+          <section className="mt-6 bg-white border rounded-2xl p-5">
             <h2 className="text-lg font-semibold">Story</h2>
-            <p className="text-gray-700 mt-2 leading-relaxed">
-              {campaign.Description}
-            </p>
-          </section>
-
-          {/* DETAILS */}
-          <section className="mt-6 bg-white border border-gray-300 shadow-sm rounded-2xl p-5">
-            <h2 className="text-lg font-semibold">Details</h2>
-
-            <div className="mt-3 space-y-2 text-sm text-gray-700">
-
-              <div className="flex justify-between">
-                <span className="text-gray-500">Category</span>
-                <span className="font-medium">
-                  {campaign.Category || "General"}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-500">Created by</span>
-                <span className="font-medium">{campaign.CreatedBy}</span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-500">Status</span>
-                <span className="font-medium text-orange-500">
-                  {isFinished ? "Closed" : "Active"}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-500">Created on</span>
-                <span className="font-medium">
-                  {new Date(campaign.CreatedAt).toLocaleDateString()}
-                </span>
-              </div>
-
-            </div>
+            <p className="mt-2 text-gray-700">{campaign.Description}</p>
           </section>
 
         </div>
 
-        {/* RIGHT SIDE DONATION CARD */}
-        <aside className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm h-fit sticky top-24">
+        <aside className="bg-white rounded-2xl border p-5 shadow-sm h-fit">
 
           <div className="text-sm text-gray-600">Goal</div>
-          <div className="text-2xl font-bold text-black mt-1">
-            Rs.{campaign.Goal?.toLocaleString()}
+          <div className="text-2xl font-bold mt-1">
+            ₹{campaign.Goal?.toLocaleString()}
           </div>
 
-          {/* PROGRESS BAR */}
           <div className="mt-4">
+
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-2 rounded-full bg-black"
+                className="h-2 bg-black"
                 style={{ width: `${percent}%` }}
               />
             </div>
 
-            <div className="mt-2 flex justify-between text-sm text-gray-600">
-              <span>Rs.{campaign.Raised?.toLocaleString()} raised</span>
+            <div className="flex justify-between text-sm mt-2">
+              <span>₹{campaign.Raised}</span>
               <span>{percent}%</span>
             </div>
+
           </div>
 
-          {/* SAME UI FOR CLOSED + COMPLETED */}
-          {isFinished ? (
+          {isClosed ? (
             <div className="mt-5 space-y-2">
-              <div className="w-full bg-gray-200 text-gray-600 py-3 rounded-lg font-medium text-center text-sm">
-                🚫 Campaign Closed
+              <div className="w-full bg-gray-200 text-gray-600 py-3 rounded-lg text-center">
+                Donations Closed
               </div>
 
               <Link
                 to="/explore"
-                className="block w-full text-center py-2.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition"
+                className="block text-center border py-2 rounded-lg"
               >
-                Explore other campaigns →
+                Explore other campaigns
               </Link>
             </div>
           ) : (
             <button
               onClick={handleDonateClick}
-              className="mt-5 w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition"
+              className="mt-5 w-full bg-black text-white py-3 rounded-lg"
             >
               {profile ? "Donate Now" : "Login to Donate"}
             </button>
           )}
 
-          {/* SUMMARY */}
-          <div className="mt-5 border-t pt-4 space-y-2 text-sm text-gray-600">
-
-            <div className="flex justify-between">
-              <span>Raised</span>
-              <span className="font-medium text-black">
-                Rs.{campaign.Raised?.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Goal</span>
-              <span className="font-medium text-black">
-                Rs.{campaign.Goal?.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Remaining</span>
-              <span className="font-medium text-black">
-                Rs.{Math.max(campaign.Goal - campaign.Raised, 0).toLocaleString()}
-              </span>
-            </div>
-
-          </div>
-
         </aside>
 
       </main>
-
-      <footer className="py-8 text-center text-sm text-gray-600 border-t">
-        &copy; 2025 GiveHelp
-      </footer>
     </div>
   );
 };
