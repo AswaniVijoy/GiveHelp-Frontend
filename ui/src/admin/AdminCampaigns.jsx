@@ -13,7 +13,6 @@ const AdminCampaigns = () => {
 
     fetch(`${API}/admin/campaigns`, {
       headers: { Authorization: token },
-      credentials: "include"
     })
       .then(res => res.json())
       .then(data => {
@@ -31,8 +30,7 @@ const AdminCampaigns = () => {
     try {
       const res = await fetch(`${API}/admin/campaign/${id}`, {
         method: "DELETE",
-        headers: { Authorization: token },
-        credentials: "include"
+        headers: { Authorization: token }
       });
 
       const data = await res.json();
@@ -58,6 +56,7 @@ const AdminCampaigns = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Manage Campaigns</h1>
 
@@ -70,13 +69,17 @@ const AdminCampaigns = () => {
       </div>
 
       <div className="mt-6 bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading...</div>
         ) : campaigns.length === 0 ? (
           <div className="p-8 text-center text-gray-500">No campaigns yet.</div>
         ) : (
+
           <div className="overflow-x-auto">
+
             <table className="w-full text-sm">
+
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
                   <th className="p-3 text-left">Title</th>
@@ -89,7 +92,9 @@ const AdminCampaigns = () => {
               </thead>
 
               <tbody>
+
                 {campaigns.map(c => (
+
                   <tr
                     key={c._id}
                     className={
@@ -97,6 +102,7 @@ const AdminCampaigns = () => {
                       (c.isDeleted ? " bg-gray-50" : "")
                     }
                   >
+
                     <td className="p-3 font-medium flex items-center gap-2">
                       {c.Title}
 
@@ -105,6 +111,7 @@ const AdminCampaigns = () => {
                           Archived
                         </span>
                       )}
+
                     </td>
 
                     <td className="p-3 text-center text-gray-500">
@@ -120,6 +127,7 @@ const AdminCampaigns = () => {
                     </td>
 
                     <td className="p-3 text-center">
+
                       <span
                         className={
                           "font-medium " +
@@ -132,9 +140,11 @@ const AdminCampaigns = () => {
                       >
                         {c.Status}
                       </span>
+
                     </td>
 
                     <td className="p-3 text-center space-x-2">
+
                       {!c.isDeleted ? (
                         <>
                           <Link
@@ -156,15 +166,23 @@ const AdminCampaigns = () => {
                           No actions
                         </span>
                       )}
+
                     </td>
 
                   </tr>
+
                 ))}
+
               </tbody>
+
             </table>
+
           </div>
+
         )}
+
       </div>
+
     </div>
   );
 };
