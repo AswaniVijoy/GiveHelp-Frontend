@@ -63,7 +63,7 @@ const CampaignDetail = () => {
 
             {isClosed && !isCompleted && (
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                <span className="text-white text-lg font-bold tracking-wide bg-gray-700 px-5 py-2 rounded-full">
+                <span className="text-white text-lg font-bold tracking-wide bg-black px-5 py-2 rounded-full">
                   🔒 Campaign Closed
                 </span>
               </div>
@@ -159,7 +159,7 @@ const CampaignDetail = () => {
           ) : isClosed ? (
 
             <div className="mt-5 space-y-2">
-              <div className="w-full bg-gray-200 text-gray-600 py-3 rounded-lg font-medium text-center text-sm">
+              <div className="w-full bg-black text-white py-3 rounded-lg font-medium text-center text-sm">
                 🔒 Donations Closed
               </div>
 
