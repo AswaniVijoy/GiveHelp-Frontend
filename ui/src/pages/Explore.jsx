@@ -1,106 +1,245 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Explore = () => {
   const [campaigns, setCampaigns] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState("All");
+  const [sort, setSort] = useState("Latest");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   const API = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetch(`${API}/campaign`)
-      .then((res) => res.json())
-      .then((data) => {
-        setCampaigns(data);
+      .then(res => res.json())
+      .then(data => {
+        setCampaigns(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading campaigns...
-      </div>
-    );
-  }
+  useEffect(() => {
+    let result = [...campaigns];
+
+    if (category !== "All") {
+      result = result.filter(c => c.Category === category);
+    }
+
+    if (statusFilter === "Active") {
+      result = result.filter(c => c.Status === "Active");
+    }
+
+    if (statusFilter === "Closed") {
+      result = result.filter(c => c.Status === "Closed");
+    }
+
+    if (sort === "Most Funded") {
+      result.sort((a, b) => (b.Raised || 0) - (a.Raised || 0));
+    } else {
+      result.sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
+    }
+
+    setFiltered(result);
+  }, [category, sort, statusFilter, campaigns]);
 
   return (
-    <div className="bg-gray-50 min-h-screen px-6 py-10">
-      <h1 className="text-3xl font-bold mb-8 text-center">Explore Campaigns</h1>
+    <div className="bg-gray-50 min-h-screen text-gray-800">
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        {campaigns.map((campaign) => {
+      <main className="max-w-6xl mx-auto px-6 pt-10 pb-16">
 
-          const percent =
-            campaign.Goal > 0
-              ? Math.min(
-                  Math.round((campaign.Raised / campaign.Goal) * 100),
-                  100
-                )
-              : 0;
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Explore Campaigns</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              {filtered.length} campaign{filtered.length !== 1 ? "s" : ""}
+            </p>
+          </div>
 
-          return (
-            <div
-              key={campaign._id}
-              className="bg-white rounded-xl shadow-sm overflow-hidden border"
+          {/* Filters */}
+          <div className="flex gap-3 flex-wrap">
+
+            <select
+              className="px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              value={category}
+              onChange={e => setCategory(e.target.value)}
             >
-              <div className="h-48 bg-gray-200">
+              <option value="All">All Categories</option>
+              <option value="Medical">Medical</option>
+              <option value="Education">Education</option>
+              <option value="Animals">Animals</option>
+              <option value="Disaster Relief">Disaster Relief</option>
+              <option value="Community">Community</option>
+            </select>
 
-                {campaign.Image ? (
-                  <img
-                    src={`${API}/campaign/image/${encodeURIComponent(
-                      campaign.Title
-                    )}`}
-                    alt={campaign.Title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400">
-                    No Image
-                  </div>
-                )}
+            <select
+              className="px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Closed">Closed</option>
+            </select>
 
-              </div>
+            <select
+              className="px-3 py-2 border rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              value={sort}
+              onChange={e => setSort(e.target.value)}
+            >
+              <option value="Latest">Latest</option>
+              <option value="Most Funded">Most Funded</option>
+            </select>
 
-              <div className="p-4">
+          </div>
+        </div>
 
-                <h2 className="font-semibold text-lg">
-                  {campaign.Title}
-                </h2>
+        {/* Loading */}
+        {loading ? (
+          <div className="mt-12 text-center text-gray-500">
+            Loading campaigns...
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="mt-12 text-center text-gray-500">
+            No campaigns found.
+          </div>
+        ) : (
 
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                  {campaign.Description}
-                </p>
+          /* Campaign Grid */
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                <div className="mt-3">
+            {filtered.map(c => {
 
-                  <div className="w-full bg-gray-200 h-2 rounded-full">
-                    <div
-                      className="h-2 bg-black rounded-full"
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
+              const pct =
+                c.Goal > 0
+                  ? Math.min(Math.round((c.Raised / c.Goal) * 100), 100)
+                  : 0;
 
-                  <div className="flex justify-between text-sm mt-2 text-gray-600">
-                    <span>₹{campaign.Raised}</span>
-                    <span>{percent}%</span>
-                  </div>
+              const isClosed = c.Status === "Closed";
 
-                </div>
+              return (
 
-                <Link
-                  to={`/campaign/${campaign._id}`}
-                  className="block mt-4 text-center bg-black text-white py-2 rounded-lg hover:bg-gray-800"
+                <article
+                  key={c._id}
+                  className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-1 transition duration-300"
                 >
-                  View Details
-                </Link>
 
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                  {/* Image */}
+                  <div className="h-44 bg-gray-100 relative">
+
+                    {c.Image ? (
+                      <img
+                        src={`${API}/campaign/image/${encodeURIComponent(c.Title)}`}
+                        alt={c.Title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                        No Image
+                      </div>
+                    )}
+
+                    {/* Funding Percentage */}
+                    {pct > 0 && (
+                      <span className="absolute top-2 right-2 bg-black text-white text-xs px-2 py-1 rounded-full">
+                        {pct}% Funded
+                      </span>
+                    )}
+
+                    {/* Closed Badge */}
+                    {isClosed && (
+                      <span className="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded-full">
+                        Closed
+                      </span>
+                    )}
+
+                    {/* Goal Achieved Badge */}
+                    {pct === 100 && (
+                      <span className="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded-full">
+                        Goal Achieved
+                      </span>
+                    )}
+
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5">
+
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                        {c.Category || "General"}
+                      </span>
+
+                      <span className="text-xs text-gray-400">
+                        {new Date(c.CreatedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {c.Title}
+                    </h3>
+
+                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                      {c.Description}
+                    </p>
+
+                    {/* Progress */}
+                    <div className="mt-4">
+
+                      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-2 bg-black rounded-full transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+
+                      {/* Funding Details */}
+                      <div className="mt-3 flex items-center justify-between text-sm">
+
+                        <div>
+                          <span className="font-semibold text-gray-900">
+                            ₹{c.Raised?.toLocaleString()}
+                          </span>
+
+                          {c.Goal > 0 && (
+                            <span className="text-gray-400">
+                              {" "} / ₹{c.Goal?.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+
+                        <Link to={`/campaign/${c._id}`}>
+                          <button
+                            className="bg-black text-white px-4 py-2 rounded-md text-sm hover:bg-gray-800 transition cursor-pointer"
+                          >
+                            {isClosed ? "View Details" : "Donate"}
+                          </button>
+                        </Link>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </article>
+
+              );
+            })}
+
+          </div>
+
+        )}
+
+      </main>
+
+      <footer className="text-center py-6 text-sm text-gray-500 border-t">
+        © 2025 GiveHelp
+      </footer>
+
     </div>
   );
 };
