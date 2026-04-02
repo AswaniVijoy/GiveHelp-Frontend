@@ -8,7 +8,7 @@ const Explore = () => {
   const API = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`${API}/campaigns`)
+    fetch(`${API}/campaign`)
       .then((res) => res.json())
       .then((data) => {
         setCampaigns(data);
@@ -31,6 +31,7 @@ const Explore = () => {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {campaigns.map((campaign) => {
+
           const percent =
             campaign.Goal > 0
               ? Math.min(
@@ -51,6 +52,7 @@ const Explore = () => {
               }`}
             >
               <div className="h-48 bg-gray-200 relative">
+
                 {campaign.Image ? (
                   <img
                     src={`${API}/campaign/image/${encodeURIComponent(
@@ -72,16 +74,21 @@ const Explore = () => {
                     </span>
                   </div>
                 )}
+
               </div>
 
               <div className="p-4">
-                <h2 className="font-semibold text-lg">{campaign.Title}</h2>
+
+                <h2 className="font-semibold text-lg">
+                  {campaign.Title}
+                </h2>
 
                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                   {campaign.Description}
                 </p>
 
                 <div className="mt-3">
+
                   <div className="w-full bg-gray-200 h-2 rounded-full">
                     <div
                       className="h-2 bg-black rounded-full"
@@ -93,6 +100,7 @@ const Explore = () => {
                     <span>₹{campaign.Raised}</span>
                     <span>{percent}%</span>
                   </div>
+
                 </div>
 
                 <Link
@@ -101,6 +109,7 @@ const Explore = () => {
                 >
                   View Details
                 </Link>
+
               </div>
             </div>
           );

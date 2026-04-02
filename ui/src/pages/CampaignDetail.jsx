@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const CampaignDetail = () => {
+
   const { id } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
@@ -13,7 +14,7 @@ const CampaignDetail = () => {
   const API = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`${API}/campaign/` + id)
+    fetch(`${API}/campaign/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setCampaign(data);
@@ -42,7 +43,8 @@ const CampaignDetail = () => {
       : 0;
 
   const isClosed =
-    campaign.Status === "Closed" || campaign.Raised >= campaign.Goal;
+    campaign.Status === "Closed" ||
+    campaign.Raised >= campaign.Goal;
 
   const handleDonateClick = () => {
     if (!profile) navigate("/login");
@@ -51,11 +53,13 @@ const CampaignDetail = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
+
       <main className="max-w-5xl mx-auto px-6 pt-10 pb-16 grid lg:grid-cols-3 gap-8">
 
         <div className="lg:col-span-2">
 
           <div className="rounded-2xl overflow-hidden bg-gray-100 h-64 relative">
+
             {campaign.Image ? (
               <img
                 src={`${API}/campaign/image/${encodeURIComponent(
@@ -77,20 +81,33 @@ const CampaignDetail = () => {
                 </span>
               </div>
             )}
+
           </div>
 
-          <h1 className="text-2xl font-bold mt-6">{campaign.Title}</h1>
+          <h1 className="text-2xl font-bold mt-6">
+            {campaign.Title}
+          </h1>
 
           <section className="mt-6 bg-white border rounded-2xl p-5">
-            <h2 className="text-lg font-semibold">Story</h2>
-            <p className="mt-2 text-gray-700">{campaign.Description}</p>
+
+            <h2 className="text-lg font-semibold">
+              Story
+            </h2>
+
+            <p className="mt-2 text-gray-700">
+              {campaign.Description}
+            </p>
+
           </section>
 
         </div>
 
         <aside className="bg-white rounded-2xl border p-5 shadow-sm h-fit">
 
-          <div className="text-sm text-gray-600">Goal</div>
+          <div className="text-sm text-gray-600">
+            Goal
+          </div>
+
           <div className="text-2xl font-bold mt-1">
             ₹{campaign.Goal?.toLocaleString()}
           </div>
@@ -112,7 +129,9 @@ const CampaignDetail = () => {
           </div>
 
           {isClosed ? (
+
             <div className="mt-5 space-y-2">
+
               <div className="w-full bg-gray-200 text-gray-600 py-3 rounded-lg text-center">
                 Donations Closed
               </div>
@@ -123,19 +142,24 @@ const CampaignDetail = () => {
               >
                 Explore other campaigns
               </Link>
+
             </div>
+
           ) : (
+
             <button
               onClick={handleDonateClick}
               className="mt-5 w-full bg-black text-white py-3 rounded-lg"
             >
               {profile ? "Donate Now" : "Login to Donate"}
             </button>
+
           )}
 
         </aside>
 
       </main>
+
     </div>
   );
 };
